@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书管理系统 :: 管理员</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            width: 100%;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-buttons button {
+            margin-right: 10px;
+        }
+        .table-container {
+            margin-top: 20px;
+            width: 100%;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+        }
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .pagination a {
+            padding: 5px 10px;
+            margin: 0 5px;
+            text-decoration: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+        }
+        .pagination .current {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>图书管理系统 - 管理员</h1>
+
+        <!-- Tab buttons -->
+        <div class="tab-buttons">
+            <button onclick="logout()">退出登录</button>
+            <a href="{% url 'logout' %}">退出登录</a>
+            <button onclick="showTab(1)">用户管理</button>
+            <button onclick="showTab(2)">借阅记录</button>
+            <button onclick="showTab(3)">图书管理</button>
+            <button onclick="showTab(4)">用户反馈</button>
+        </div>
+
+        <!-- Tab content -->
+        <div class="tab-content" id="tab1" {% if current_tab == 1 %} class="active" {% endif %}>
+            <h2>用户管理</h2>
+            <button onclick="registerNew()">新增用户</button>
+            <button onclick="deleteBorrower()">删除用户</button>
+            <form method="POST" action="{% url 'manage' id=id %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="member_search" />
+                <input type="text" placeholder="用户电话" name="tel">
+                <input type="text" placeholder="用户姓名" name="name">
+                <button type="submit">查找</button>
+            </form>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>地址</th>
+                            <th>电话</th>
+                            <th>登录状态</th>
+                            <th>借阅数量</th>
+                            <th>最后登录</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if members %}
+                            {% for member in members %}
+                            <tr>
+                                <td>{{ member.username }}</td>
+                                <td>{{ member.address }}</td>
+                                <td>{{ member.tel }}</td>
+                                <td>{{ member.is_active|yesno:"活跃中,已注销" }}</td>
+                                <td>{{ member.book_number }}</td>
+                                <td>{{ member.last_login|date:"Y-m-d H:i:s" }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6">{{ message|default:"未找到符合条件的成员。" }}</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <span class="step-links">
+                    {% with request.GET.member_page|default:1 as member_page %}
+                        {% if members.has_previous %}
+                            <!-- 首页按钮 -->
+                            <button onclick="goToPage(1, {{ book_page|default:1 }}, {{ sell_page|default:1 }}, {{ deletion_page|default:1 }}, {{ currentTab }})">首页</button>
+                            <!-- 上一页按钮 -->
+                            <button onclick="goToPage({{ members.previous_page_number }}, {{ book_page|default:1 }}, {{ sell_page|default:1 }}, {{ deletion_page|default:1 }}, {{ currentTab }})">上一页</button>
+                        {% endif %}
+
+                        <span class="current">
+                            第 {{ members.number }} 页，共 {{ members.paginator.num_pages }} 页
+                        </span>
+
+                        {% if members.has_next %}
+                            <!-- 下一页按钮 -->
+                            <button onclick="goToPage({{ members.next_page_number }}, {{ book_page|default:1 }}, {{ sell_page|default:1 }}, {{ deletion_page|default:1 }}, {{ currentTab }})">下一页</button>
+                            <!-- 最后一页按钮 -->
+                            <button onclick="goToPage({{ members.paginator.num_pages }}, {{ book_page|default:1 }}, {{ sell_page|default:1 }}, {{ deletion_page|default:1 }}, {{ currentTab }})">最后一页</button>
+                        {% endif %}
+                    {% endwith %}
+                </span>
+            </div>
+
+        </div>
+
+        <div class="tab-content" id="tab2" {% if current_tab == 2 %} class="active" {% endif %}>
+            <h2>借阅记录管理</h2>
+            <button onclick="searchRecord()">查找记录</button>
+            <input type="text" placeholder="用户电话或姓名" id="borrowerRecordInput">
+            <input type="text" placeholder="图书ID或名称" id="bookRecordInput">
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>用户姓名</th>
+                            <th>用户电话</th>
+                            <th>图书ID</th>
+                            <th>图书名称</th>
+                            <th>借出时间</th>
+                            <th>归还时间</th>
+                            <th>是否归还</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if sells %}
+                            {% for sell in sells %}
+                            <tr>
+                                <td>{{ sell.m_name }}</td>
+                                <td>{{ sell.m_tel }}</td>
+                                <td>{{ sell.b_id }}</td>
+                                <td>{{ sell.b_name }}</td>
+                                <td>{{ sell.time_out|date:"Y-m-d H:i:s" }}</td>
+                                <td>{{ sell.time_back|date:"Y-m-d H:i:s" }}</td>
+                                <td>{{ sell.is_back|yesno:"已归还,未归还" }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="7">No records found</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <span class="step-links">
+                    {% with request.GET.sell_page|default:1 as sell_page %}
+                        {% if sells.has_previous %}
+                            <!-- 首页按钮 -->
+                            <button onclick="goToPage('member_page={{ member_page|default:1 }}&book_page={{ book_page|default:1 }}&sell_page=1&deletion_page={{ deletion_page|default:1 }}&tab={{ currentTab }}')">首页</button>
+                            <!-- 上一页按钮 -->
+                            <button onclick="goToPage('member_page={{ member_page|default:1 }}&book_page={{ book_page|default:1 }}&sell_page={{ sells.previous_page_number }}&deletion_page={{ deletion_page|default:1 }}&tab={{ currentTab }}')">上一页</button>
+                        {% endif %}
+            
+                        <span class="current">
+                            第 {{ sells.number }} 页，共 {{ sells.paginator.num_pages }} 页
+                        </span>
+            
+                        {% if sells.has_next %}
+                            <!-- 下一页按钮 -->
+                            <button onclick="goToPage('member_page={{ member_page|default:1 }}&book_page={{ book_page|default:1 }}&sell_page={{ sells.next_page_number }}&deletion_page={{ deletion_page|default:1 }}&tab={{ currentTab }}')">下一页</button>
+                            <!-- 最后一页按钮 -->
+                            <button onclick="goToPage('member_page={{ member_page|default:1 }}&book_page={{ book_page|default:1 }}&sell_page={{ sells.paginator.num_pages }}&deletion_page={{ deletion_page|default:1 }}&tab={{ currentTab }}')">最后一页</button>
+                        {% endif %}
+                    {% endwith %}
+                </span>
+            </div>
+
+        </div>
+
+        <div class="tab-content" id="tab3" {% if current_tab == 3 %} class="active" {% endif %}>
+            <h2>图书管理</h2>
+            <button onclick="addBook()">新增图书</button>
+            <button onclick="removeBook()">减少图书</button>
+            <input type="text" placeholder="图书ID" id="bookIdInput">
+            <input type="text" placeholder="图书名称" id="searchBookInput">
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>图书ID</th>
+                            <th>图书名称</th>
+                            <th>区域</th>
+                            <th>地址</th>
+                            <th>数量</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if books %}
+                            {% for book in books %}
+                            <tr>
+                                <td>{{ book.b_id }}</td>
+                                <td>{{ book.b_name }}</td>
+                                <td>{{ book.b_zone }}</td>
+                                <td>{{ book.b_address }}</td>
+                                <td>{{ book.b_state }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="5">No books found</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <span class="step-links">
+                    {% with request.GET.book_page|default:1 as book_page %}
+                        {% if books.has_previous %}
+                            <!-- 首页按钮 -->
+                            <button onclick="goToPage('{{ member_page|default:1 }}', 1, '{{ sell_page|default:1 }}', '{{ deletion_page|default:1 }}', '{{ currentTab }}')">首页</button>
+                            <!-- 上一页按钮 -->
+                            <button onclick="goToPage('{{ member_page|default:1 }}', {{ books.previous_page_number }}, '{{ sell_page|default:1 }}', '{{ deletion_page|default:1 }}', '{{ currentTab }}')">上一页</button>
+                        {% endif %}
+            
+                        <span class="current">
+                            第 {{ books.number }} 页，共 {{ books.paginator.num_pages }} 页
+                        </span>
+            
+                        {% if books.has_next %}
+                            <!-- 下一页按钮 -->
+                            <button onclick="goToPage('{{ member_page|default:1 }}', {{ books.next_page_number }}, '{{ sell_page|default:1 }}', '{{ deletion_page|default:1 }}', '{{ currentTab }}')">下一页</button>
+                            <!-- 最后一页按钮 -->
+                            <button onclick="goToPage('{{ member_page|default:1 }}', {{ books.paginator.num_pages }}, '{{ sell_page|default:1 }}', '{{ deletion_page|default:1 }}', '{{ currentTab }}')">最后一页</button>
+                        {% endif %}
+                    {% endwith %}
+                </span>
+            </div>
+
+        </div>
+
+        <div class="tab-content" id="tab4" {% if current_tab == 4 %} class="active" {% endif %}>
+            <h2>反馈</h2>
+            <button onclick="viewInventory()">图书反馈</button>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>书名</th>
+                            <th>反馈内容</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if deletions %}
+                            {% for deletion in deletions %}
+                            <tr>
+                                <td>{{ deletion.b_id }}</td>
+                                <td>{{ deletion.b_content }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="2">No data</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <span class="step-links">
+                    {% with request.GET.deletion_page|default:1 as deletion_page %}
+                        {% if deletions.has_previous %}
+                            <!-- 首页按钮 -->
+                            <button onclick="goToPage('{{ member_page|default:1 }}', '{{ book_page|default:1 }}', '{{ sell_page|default:1 }}', 1, '{{ currentTab }}')">首页</button>
+                            <!-- 上一页按钮 -->
+                            <button onclick="goToPage('{{ member_page|default:1 }}', '{{ book_page|default:1 }}', '{{ sell_page|default:1 }}', {{ deletions.previous_page_number }}, '{{ currentTab }}')">上一页</button>
+                        {% endif %}
+            
+                        <span class="current">
+                            第 {{ deletions.number }} 页，共 {{ deletions.paginator.num_pages }} 页
+                        </span>
+            
+                        {% if deletions.has_next %}
+                            <!-- 下一页按钮 -->
+                            <button onclick="goToPage('{{ member_page|default:1 }}', '{{ book_page|default:1 }}', '{{ sell_page|default:1 }}', {{ deletions.next_page_number }}, '{{ currentTab }}')">下一页</button>
+                            <!-- 最后一页按钮 -->
+                            <button onclick="goToPage('{{ member_page|default:1 }}', '{{ book_page|default:1 }}', '{{ sell_page|default:1 }}', {{ deletions.paginator.num_pages }}, '{{ currentTab }}')">最后一页</button>
+                        {% endif %}
+                    {% endwith %}
+                </span>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function goToPage(memberPage, bookPage, sellPage, deletionPage, tab) {
+            {#if (!memberPage || memberPage === 'None') {#}
+            {#    memberPage = '1';  // 默认显示第一个tab}#}
+            {#if (!bookPage || bookPage === 'None') {#}
+            {#    bookPage = '1';  // 默认显示第一个tab}#}
+            {#if (!sellPage || sellPage === 'None') {#}
+            {#    sellPage = '1';  // 默认显示第一个tab}#}
+            {#if (!deletionPage || deletionPage === 'None') {#}
+            {#    deletionPage = '1';  // 默认显示第一个tab}#}
+            const params = new URLSearchParams({
+                member_page: memberPage,
+                book_page: bookPage,
+                sell_page: sellPage,
+                deletion_page: deletionPage,
+                tab: tab
+            });
+        
+            // 构建完整的 URL
+            const baseUrl = window.location.origin + window.location.pathname;
+            const url = `${baseUrl}?${params.toString()}`;
+            window.location.href = url; // 重定向到新的 URL
+        }
+
+        let currentTab = 1;
+
+        function getTabFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let tab = urlParams.get('tab');
+
+            // 如果tab为None或无效，则设置默认值
+            if (!tab || tab === 'None') {
+                tab = '1';  // 默认显示第一个tab
+            }
+
+            return tab;
+        }
+
+
+        // 页面加载时显示选中的 tab
+        document.addEventListener("DOMContentLoaded", function() {
+            const currentTab = getTabFromUrl();
+            showTab(currentTab);
+        });
+
+        // 显示选中的 tab
+        function showTab(tabIndex) {
+            currentTab = tabIndex;  // 更新当前 tab 的值
+
+            // 更新 URL 中的 tab 参数
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', tabIndex);
+            window.history.pushState({}, '', url);
+
+            // 隐藏所有 tab
+            let tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // 显示选中的 tab
+            document.getElementById('tab' + tabIndex).classList.add('active');
+        }
+        
+        
+        {#function logout() {#}
+        {#    const csrftoken = getCookie('csrftoken');#}
+        {#    $.ajax({#}
+        {#        url: "{% url 'manage' id=tel %}",  // Django URL 模板标签，传入用户的 tel#}
+        {#        type: "PATCH",  // 使用 PATCH 请求#}
+        {#        headers: {#}
+        {#            "X-CSRFToken": csrftoken}, // 添加 CSRF token 到请求头#}
+        {#        success: function(response) {#}
+        {#            alert('退出成功');#}
+        {#            window.location.href = "{% url 'login' %}";  // 退出后跳转到登录页面#}
+        {#        },#}
+        {#        error: function(xhr, status, error) {#}
+        {#            console.error("退出登录失败:", error);#}
+        {#            alert('退出失败，请重试');#}
+        {#        }#}
+        {#    });}#}
+
+        function registerNew() {
+            alert('Registering new borrower...');
+            // Implement the logic to register a new borrower
+        }
+
+        function deleteBorrower() {
+            alert('Deleting borrower...');
+            // Implement the logic to delete a borrower
+        }
+
+        function searchRecord() {
+            alert('Searching for borrowing records...');
+            // Implement the logic to search for borrowing records
+        }
+
+        function addBook() {
+            alert('Adding new book...');
+            // Implement the logic to add a new book
+        }
+
+        function removeBook() {
+            alert('Removing book...');
+            // Implement the logic to remove a book
+        }
+
+        function viewInventory() {
+            alert('Viewing book inventory...');
+            // Implement the logic to view book inventory
+        }
+    </script>
+
+</body>
+</html>

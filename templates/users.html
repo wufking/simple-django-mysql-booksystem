@@ -1,0 +1,304 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书管理系统::借阅人界面</title>
+{#    <link rel="stylesheet" href="{% static 'css/style.css' %}">#}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .table-container {
+            overflow-x: auto;
+            max-width: 100%;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>借阅人界面</h1>
+    <div>
+        <button onclick="logout()">退出登录</button>
+        <button onclick="openModal('returnBookModal')">归还图书</button>
+        <button onclick="openModal('borrowBookModal')">借阅图书</button>
+        <form method="POST" action="{% url 'users' tel=tel %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="search" />
+            <input type="text" id="searchInput" placeholder="输入图书ID或书名" name="id_name"/>
+            <button id="searchButton" type="submit">查找图书</button>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <table id="bookTable">
+            <thead>
+                <tr>
+                    <th>图书id</th>
+                    <th>书名</th>
+                    <th>所在区域</th>
+                    <th>地址</th>
+                    <th>剩余数量</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 图书信息将通过 JavaScript 填充 -->
+            {% for book in books %}
+                <tr>
+                    <th>{{ book.b_id }}</th>
+                    <th>{{ book.b_name }}</th>
+                    <th>{{ book.b_zone }}</th>
+                    <th>{{ book.b_address }}</th>
+                    <th>{{ book.b_state }}</th>
+                </tr>
+                
+            {% endfor %}
+            <!-- 分页 -->
+            <div class="pagination">
+                <span class="step-links">
+                    {% if books.has_previous %}
+                        <a href="?page=1">&laquo; 第一页</a>
+                        <a href="?page={{ books.previous_page_number }}">上一页</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        第 {{ books.number }} 页，共 {{ books.paginator.num_pages }} 页
+                    </span>
+            
+                    {% if books.has_next %}
+                        <a href="?page={{ books.next_page_number }}">下一页</a>
+                        <a href="?page={{ books.paginator.num_pages }}">最后一页 &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 归还图书弹窗 -->
+    <div id="returnBookModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('returnBookModal')">&times;</span>
+            <h2>归还图书</h2>
+            <input type="text" id="returnBookId" placeholder="输入书籍ID"  required/>
+            <button type="button" onclick="returnBook()">确认归还</button>
+        </div>
+    </div>
+
+    <!-- 借阅图书弹窗 -->
+    <div id="borrowBookModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('borrowBookModal')">&times;</span>
+            <h2>借阅图书</h2>
+            <form id="borrowBookForm">
+{#            <form method="POST" action="{% url 'users' tel=tel %}">#}
+{#                {% csrf_token %}#}
+{#                <input type="hidden" name="action" value="borrow" />#}
+                <input type="text" id="borrowBookId" placeholder="输入书籍ID" name="b_id" required />
+                <button type="button" onclick="borrowBook()">借阅图书</button>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- 登录状态验证异常返回 -->
+    <div id="dl-error" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('dl-error')">&times;</span>
+            <h2>登录状态异常，请重新登录！</h2>
+            <button onclick="location.href='{% url 'login' %}'">确认归还</button>
+        </div>
+    </div>
+
+    <script>
+         {#$(document).ready(function() {#}
+         {#   $('#searchButton').click(function() {#}
+         {#       const searchQuery = $('#searchInput').val();#}
+         {#       $.post("{% url 'users' tel=tel %}", {action: 'search', query: searchQuery}, function(data) {#}
+         {#           const tbody = $('#bookTable tbody');#}
+         {#           tbody.empty();  // 清空表格#}
+         {#           data.forEach(function(book) {#}
+         {#               tbody.append('<tr><td>' + book.b_id + '</td><td>' + book.b_name + '</td><td>' + book.b_zone + '</td><td>' + book.b_address + '</td><td>' + book.b_state + '</td></tr>');#}
+         {#           });#}
+         {#       });#}
+         {#   });});#}
+        {#const csrftoken = getCookie('csrftoken');   #}
+    
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
+    
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+    
+        function returnBook() {
+            const bookId = document.getElementById('returnBookId').value;
+            const csrftoken = getCookie('csrftoken'); 
+            $.post({
+                url:"{% url 'users' tel=tel %}",
+                data: {action: 'return', b_id:bookId},
+                headers: {
+                    "X-CSRFToken": csrftoken}, // 添加 CSRF token 到请求头
+                
+
+                success: function(response) {
+                    alert(response.message);
+                    closeModal('returnBookModal'); // 先关闭模态框
+                    if (response.status === 'login_error' || response.status === 'member_error' ){
+                        window.location.href = "{% url 'login' %}";
+                    }
+                    else{
+                        window.location.href = "{% url 'users' tel=tel %}";
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("请求失败: ", status, error);
+                    window.location.href = "{% url 'users' tel=tel %}";
+                }
+            });
+        }
+    
+        function borrowBook() {
+            const bookId = document.getElementById('borrowBookId').value;
+
+            if (!bookId) {
+                alert("请输入书籍ID！");
+                return;  // 输入为空时，直接返回，不发送请求
+            }
+
+            const csrftoken = getCookie('csrftoken');
+            $.post({
+                url: "{% url 'users' tel=tel %}",
+                data: {action: 'borrow', b_id: bookId},
+                headers: {
+                    "X-CSRFToken": csrftoken}, // 添加 CSRF token 到请求头
+
+
+                success: function(response) {
+                    alert(response.message);
+                    closeModal('borrowBookModal'); // 先关闭模态框
+                    if (response.status === 'dl_error' || response.status === 'member_error' ){
+                        window.location.href = "{% url 'login' %}";
+                    }
+                    else{
+                        window.location.href = "{% url 'users' tel=tel %}";
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("请求失败: ", status, error);
+                    window.location.href = "{% url 'users' tel=tel %}";
+                }
+            });
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // 检查cookie是否以指定名称开头
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        function logout() {
+            const csrftoken = getCookie('csrftoken');
+            $.ajax({
+                url: "{% url 'users' tel=tel %}",  // Django URL 模板标签，传入用户的 tel
+                type: "PATCH",  // 使用 PATCH 请求
+                headers: {
+                    "X-CSRFToken": csrftoken}, // 添加 CSRF token 到请求头
+                success: function(response) {
+                    alert('退出成功');
+                    window.location.href = "{% url 'login' %}";  // 退出后跳转到登录页面
+                },
+                error: function(xhr, status, error) {
+                    console.error("退出登录失败:", error);
+                    alert('退出失败，请重试');
+                }
+            });
+        }
+
+    
+        {#$(document).ready(function() {#}
+            {#$('#searchButton').click(function() {#}
+            {#    const searchQuery = $('#searchInput').val();#}
+            {#    $.post("{% url 'users' tel=tel %}", {action: 'search', query: searchQuery}, function(data) {#}
+            {#        const tbody = $('#bookTable tbody');#}
+            {#        tbody.empty();  // 清空表格#}
+            {#        data.forEach(function(book) {#}
+            {#            tbody.append('<tr><td>' + book.b_id + '</td><td>' + book.b_name + '</td><td>' + book.b_zone + '</td><td>' + book.b_address + '</td><td>' + book.b_state + '</td></tr>');#}
+            {#        });#}
+            {#    });});#}
+        {##}
+        {#    $('#bookTable').on('contextmenu', 'tbody tr', function(e) {#}
+        {#        e.preventDefault();#}
+        {#        const bookId = $(this).find('td').eq(0).text(); // 假设图书ID在第一列#}
+        {#        alert('右键操作借阅图书ID: ' + bookId);#}
+        {#        // 这里可以直接借阅图书的逻辑#}
+        {#        $.post("{% url 'users' tel=tel %}", {action: 'borrow', book_id: bookId}, function(response) {#}
+        {#            alert(response.message);#}
+        {#        });#}
+        {#    });});#}
+    </script>
+
+</body>
+</html>

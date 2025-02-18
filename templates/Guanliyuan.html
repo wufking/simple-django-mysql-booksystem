@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书管理系统 :: 管理员</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            width: 100%;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-buttons button {
+            margin-right: 10px;
+        }
+        .table-container {
+            margin-top: 20px;
+            width: 100%;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+        }
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .pagination a {
+            padding: 5px 10px;
+            margin: 0 5px;
+            text-decoration: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+        }
+        .pagination .current {
+            font-weight: bold;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        .modal-content2 {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            min-width: 30%; /* 最小宽度 30% */
+            max-width: 60%; /* 最大宽度 60% */
+            width: 50%; /* 默认宽度为 50% */
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>图书管理系统 - 管理员</h1>
+
+        <!-- Tab buttons -->
+        <div class="tab-buttons">
+            <button onclick="location.href='{% url 'logout' %}'">退出登录</button>
+            <button onclick="showTab(1)">用户管理</button>
+            <button onclick="showTab(2)">借阅记录</button>
+            <button onclick="showTab(3)">图书管理</button>
+            <button onclick="showTab(4)">用户反馈</button>
+        </div>
+
+        <!-- Tab content -->
+        <div class="tab-content" id="tab1" {% if current_tab == 1 %} class="active" {% endif %}>
+            <h2>用户管理</h2>
+            <button type="submit" name="action" value="member_add" onclick="openModal('addmember')">新增用户</button>
+            <button type="submit" name="action" value="member_del" onclick="openModal('delmember')">删除用户</button>
+            <form method="POST" action="{% url 'manage' id=id %}">
+                {% csrf_token %}
+{#                <input type="hidden" name="action" value="member_search" />#}
+                <input type="text" placeholder="用户电话" name="tel" id="membertel">
+                <input type="text" placeholder="用户姓名" name="name" id="membername">
+                <button type="submit" name="action" value="member_search">查找用户</button>
+                <button type="submit" name="action" value="member_status">已有借阅</button>
+            </form>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>地址</th>
+                            <th>电话</th>
+                            <th>激活状态</th>
+                            <th>借阅数量</th>
+                            <th>最后登录</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if members %}
+                            {% for member in members %}
+                            <tr>
+                                <td>{{ member.username }}</td>
+                                <td>{{ member.address }}</td>
+                                <td>{{ member.tel }}</td>
+                                <td>{{ member.is_active|yesno:"活跃中,已注销" }}</td>
+                                <td>{{ member.book_number }}</td>
+                                <td>{{ member.last_login|date:"Y-m-d H:i:s" }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6">{{ message|default:"未找到符合条件的成员。" }}</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <span class="step-links">
+                    {% with request.GET.member_page|default:1 as member_page %}
+                    {% if members.has_previous %}
+                        <a href="?member_page=1&book_page={{ book_page|default:1 }}&sell_page={{ sell_page|default:1 }}&deletion_page={{ deletion_page|default:1 }}&tab=1">首页</a>
+                        <a href="?member_page={{ members.previous_page_number }}&book_page={{ book_page|default:1 }}&sell_page={{ sell_page|default:1 }}&deletion_page={{ deletion_page|default:1 }}&tab=1">上一页</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        第 {{ members.number }} 页，共 {{ members.paginator.num_pages }} 页
+                    </span>
+            
+                    {% if members.has_next %}
+                        <!-- 下一页 -->
+                        <a href="?member_page={{ members.next_page_number }}&book_page={{ book_page|default:1 }}&sell_page={{ sell_page|default:1 }}&deletion_page={{ deletion_page|default:1 }}&tab=1">下一页</a>
+                        <!-- 最后一页 -->
+                        <a href="?member_page={{ members.paginator.num_pages }}&book_page={{ book_page|default:1 }}&sell_page={{ sell_page|default:1 }}&deletion_page={{ deletion_page|default:1 }}&tab=1">最后一页</a>
+                    {% endif %}
+                    {% endwith %}
+                </span>
+            </div>
+
+        </div>
+
+        <div class="tab-content" id="tab2" {% if current_tab == 2 %} class="active" {% endif %}>
+            <h2>借阅记录管理</h2>
+            <form method="post" action="{% url 'manage' id=id %}?tab=2">
+                {% csrf_token %}
+                <input type="text" placeholder="用户电话或图书ID" name="tel_id">
+                <input type="text" placeholder="图书名或图书名称" name="name">
+                <button type="submit" name="action" value="searchsell">查找记录</button>
+            </form>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>用户姓名</th>
+                            <th>用户电话</th>
+                            <th>图书ID</th>
+                            <th>图书名称</th>
+                            <th>借出时间</th>
+                            <th>归还时间</th>
+                            <th>是否归还</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if sells %}
+                            {% for sell in sells %}
+                            <tr>
+                                <td>{{ sell.m_name }}</td>
+                                <td>{{ sell.m_tel }}</td>
+                                <td>{{ sell.b_id }}</td>
+                                <td>{{ sell.b_name }}</td>
+                                <td>{{ sell.time_out|date:"Y-m-d H:i:s" }}</td>
+                                <td>{{ sell.time_back|date:"Y-m-d H:i:s" }}</td>
+                                <td>{{ sell.is_back|yesno:"已归还,未归还" }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="7">{{ message|default:"未找到符合条件的记录。" }}</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <span class="step-links">
+                    {% with request.GET.sell_page|default:1 as sell_page %}
+                    {% if sells.has_previous %}
+                        <!-- 首页 -->
+                        <a href="?member_page={{ member_page|default:1 }}&book_page={{ book_page|default:1 }}&sell_page=1&deletion_page={{ deletion_page|default:1 }}&tab=2">首页</a>
+                        <!-- 上一页 -->
+                        <a href="?member_page={{ member_page|default:1 }}&book_page={{ book_page|default:1 }}&sell_page={{ sells.previous_page_number }}&deletion_page={{ deletion_page|default:1 }}&tab=2">上一页</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        第 {{ sells.number }} 页，共 {{ sells.paginator.num_pages }} 页
+                    </span>
+            
+                    {% if sells.has_next %}
+                        <!-- 下一页 -->
+                        <a href="?member_page={{ member_page|default:1 }}&book_page={{ book_page|default:1 }}&sell_page={{ sells.next_page_number }}&deletion_page={{ deletion_page|default:1 }}&tab=2">下一页</a>
+                        <!-- 最后一页 -->
+                        <a href="?member_page={{ member_page|default:1 }}&book_page={{ book_page|default:1 }}&sell_page={{ sells.paginator.num_pages }}&deletion_page={{ deletion_page|default:1 }}&tab=2">最后一页</a>
+                    {% endif %}
+                    {% endwith %}
+                </span>
+            </div>
+
+        </div>
+
+        <div class="tab-content" id="tab3" {% if current_tab == 3 %} class="active" {% endif %}>
+            <h2>图书管理</h2>
+            <button onclick="openModal('addbooks')" >新增图书</button>
+            <button onclick="openModal('bookremove')">删除图书</button>
+            <form method="post" action="{% url 'manage' id=id %}?tab=3">
+                {% csrf_token %}
+                <input type="text" placeholder="图书ID" name="id">
+                <input type="text" placeholder="图书名称" name="name">
+                <button type="submit" name="action" value="searchbooks">查找图书</button>
+            </form>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>图书ID</th>
+                            <th>图书名称</th>
+                            <th>区域</th>
+                            <th>地址</th>
+                            <th>数量</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if books %}
+                            {% for book in books %}
+                            <tr>
+                                <td>{{ book.b_id }}</td>
+                                <td>{{ book.b_name }}</td>
+                                <td>{{ book.b_zone }}</td>
+                                <td>{{ book.b_address }}</td>
+                                <td>{{ book.b_state }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="5">No books found</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <span class="step-links">
+                    {% with request.GET.book_page|default:1 as book_page %}
+                    {% if books.has_previous %}
+                        <!-- 首页 -->
+                        <a href="?member_page={{ member_page|default:1 }}&book_page=1&sell_page={{ sell_page|default:1 }}&deletion_page={{ deletion_page|default:1 }}&tab=3">首页</a>
+                        <!-- 上一页 -->
+                        <a href="?member_page={{ member_page|default:1 }}&book_page={{ books.previous_page_number }}&sell_page={{ sell_page|default:1 }}&deletion_page={{ deletion_page|default:1 }}&tab=3">上一页</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        第 {{ books.number }} 页，共 {{ books.paginator.num_pages }} 页
+                    </span>
+            
+                    {% if books.has_next %}
+                        <!-- 下一页 -->
+                        <a href="?member_page={{ member_page|default:1 }}&book_page={{ books.next_page_number }}&sell_page={{ sell_page|default:1 }}&deletion_page={{ deletion_page|default:1 }}&tab=3">下一页</a>
+                        <!-- 最后一页 -->
+                        <a href="?member_page={{ member_page|default:1 }}&book_page={{ books.paginator.num_pages }}&sell_page={{ sell_page|default:1 }}&deletion_page={{ deletion_page|default:1 }}&tab=3">最后一页</a>
+                    {% endif %}
+                    {% endwith %}
+                </span>
+            </div>
+
+        </div>
+
+        <div class="tab-content" id="tab4" {% if current_tab == 4 %} class="active" {% endif %}>
+            <h2>反馈</h2>
+{#            <button onclick="viewInventory()">图书反馈</button>#}
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>书名</th>
+                            <th>反馈内容</th>
+                            <th>建立时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if deletions %}
+                            {% for deletion in deletions %}
+                            <tr>
+                                <td>{{ deletion.b_id }}</td>
+                                <td>{{ deletion.b_content }}</td>
+                                <td>{{ deletion.settime }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="3">No data</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <span class="step-links">
+                    {% with request.GET.deletion_page|default:1 as deletion_page %}
+                    {% if deletions.has_previous %}
+                        <!-- 首页 -->
+                        <a href="?member_page={{ member_page|default:1 }}&book_page={{ book_page|default:1 }}&sell_page={{ sell_page|default:1 }}&deletion_page=1&tab=4">首页</a>
+                        <!-- 上一页 -->
+                        <a href="?member_page={{ member_page|default:1 }}&book_page={{ book_page|default:1 }}&sell_page={{ sell_page|default:1 }}&deletion_page={{ deletions.previous_page_number }}&tab=4">上一页</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        第 {{ deletions.number }} 页，共 {{ deletions.paginator.num_pages }} 页
+                    </span>
+            
+                    {% if deletions.has_next %}
+                        <!-- 下一页 -->
+                        <a href="?member_page={{ member_page|default:1 }}&book_page={{ book_page|default:1 }}&sell_page={{ sell_page|default:1 }}&deletion_page={{ deletions.next_page_number }}&tab=4">下一页</a>
+                        <!-- 最后一页 -->
+                        <a href="?member_page={{ member_page|default:1 }}&book_page={{ book_page|default:1 }}&sell_page={{ sell_page|default:1 }}&deletion_page={{ deletions.paginator.num_pages }}&tab=4">最后一页</a>
+                    {% endif %}
+                    {% endwith %}
+                </span>
+            </div>
+
+        </div>
+    
+        <!--删除用户弹窗-->
+        <div id="delmember" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('delmember')">&times;</span>
+                <h2>删除用户</h2>
+                <button type="button" onclick="deletemember()">确认删除</button>
+                <button type="button" onclick="closeModal('delmember')">取消删除</button>
+            </div>
+        </div>
+    
+        <!--删除图书弹窗-->
+        <div id="bookremove" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('bookremove')">&times;</span>
+                <h2>删除图书</h2>
+                <input type="text" placeholder="图书ID" id="bookIdInput" required>
+                <input type="text" placeholder="删除数量" id="bookstateInput" required>
+                <button type="button" onclick="removeBook()">确认删除</button>
+                <button type="button" onclick="closeModal('bookremove')">取消删除</button>
+            </div>
+        </div>
+    
+        <!--新增用户弹窗-->
+        <div id="addmember" class="modal">
+            <div class="modal-content2" style="text-align: center;">
+                <span class="close" onclick="closeModal('addmember')">&times;</span>
+                <h2>用户信息</h2>
+                {% csrf_token %}
+                <input type="text" placeholder="用户姓名" id="m_name" required style="width: 300px; margin: 10px;">
+                <br>    
+                <input type="text" placeholder="用户电话" id="m_tel" required style="width: 300px; margin: 10px;">
+                <br>    
+                <input type="text" placeholder="用户地址" id="m_address" required style="width: 300px; margin: 10px;">
+                <br>    
+                <input type="text" placeholder="用户身份证" id="m_code" required style="width: 300px; margin: 10px;">
+                <br>    
+                <input type="text" placeholder="用户密码" id="m_pwd" required style="width: 300px; margin: 10px;">
+                <br>    
+                <button type="button" onclick="memberadd()" style="width: 300px; margin: 10px;">确认</button>
+                <br>    
+                <button type="button" onclick="closeModal('addmember')" style="width: 300px; margin: 10px;">取消</button>
+            </div>
+        </div>
+    
+        <!--新增图书弹窗-->
+        <div id="addbooks" class="modal">
+            <div class="modal-content2" style="text-align: center;">
+                <span class="close" onclick="closeModal('addbooks')">&times;</span>
+                <h2>用户信息</h2>
+                {% csrf_token %}
+                <input type="text" placeholder="图书id" id="b_id" required style="width: 300px; margin: 10px;">
+                <br>    
+                <input type="text" placeholder="书名" id="b_name" style="width: 300px; margin: 10px;">
+                <br>    
+                <input type="text" placeholder="区域" id="b_zone" style="width: 300px; margin: 10px;">
+                <br>    
+                <input type="text" placeholder="图书地址" id="b_address" style="width: 300px; margin: 10px;">
+                <br>    
+                <input type="text" placeholder="数量" id="b_state" style="width: 300px; margin: 10px;">
+                <br>    
+                <button type="submit" onclick="bookadd()" style="width: 300px; margin: 10px;">确认</button>
+                <br>    
+                <button type="button" onclick="closeModal('addbooks')" style="width: 300px; margin: 10px;">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
+    
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+        
+        function memberadd(){
+            const name = document.getElementById('m_name').value;
+            const tel = document.getElementById('m_tel').value;
+            const address = document.getElementById('m_address').value;
+            const code = document.getElementById('m_code').value;
+            const pwd = document.getElementById('m_pwd').value;
+            const csrftoken = getCookie('csrftoken'); 
+            $.post({
+                url:"{% url 'manage' id=id %}?tab=1",
+                data: {action: 'member_add', name:name, tel:tel, address:address,code:code,pwd:pwd},
+                headers: {
+                    "X-CSRFToken": csrftoken}, // 添加 CSRF token 到请求头
+
+                success: function(response) {
+                    alert(response.message);
+                    closeModal('delmember'); // 先关闭模态框
+                    window.location.href = "{% url 'manage' id=id %}?tab=1";
+                },
+                error: function(xhr, status, error) {
+                    console.error("请求失败: ", status, error);
+                    window.location.href = "{% url 'manage' id=id %}?tab=1";
+                }
+            });
+        }
+        
+        function deletemember() {
+            const m_tel = document.getElementById('membertel').value;
+            const m_name = document.getElementById('membername').value;
+            const csrftoken = getCookie('csrftoken'); 
+            $.post({
+                url:"{% url 'manage' id=id %}?tab=1",
+                data: {action: 'member_del', tel:m_tel, name:m_name},
+                headers: {
+                    "X-CSRFToken": csrftoken}, // 添加 CSRF token 到请求头
+                
+
+                success: function(response) {
+                    alert(response.message);
+                    closeModal('delmember'); // 先关闭模态框
+                    window.location.href = "{% url 'manage' id=id %}?tab=1";
+                },
+                error: function(xhr, status, error) {
+                    console.error("请求失败: ", status, error);
+                    window.location.href = "{% url 'manage' id=id %}?tab=1";
+                }
+            });
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // 检查cookie是否以指定名称开头
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        function getTabFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let tab = urlParams.get('tab');
+            
+            // 如果tab为None或无效，则设置默认值
+            if (!tab || tab === 'None') {
+                tab = '1';}  // 默认显示第一个tab
+        
+            return tab;}
+        
+        // 页面加载时显示选中的 tab
+        document.addEventListener("DOMContentLoaded", function() {
+            const currentTab = getTabFromUrl();
+            showTab(currentTab);});
+
+        // 显示选中的 tab
+        function showTab(tabIndex) {
+            {#currentTab = tabIndex;  // 更新当前 tab 的值#}
+            
+            // 更新 URL 中的 tab 参数
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', tabIndex);
+            window.history.pushState({}, '', url);
+        
+            // 隐藏所有 tab
+            let tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+        
+            // 显示选中的 tab
+            document.getElementById('tab' + tabIndex).classList.add('active');}
+
+        function logout() {
+            $.patch({
+                url: "{% url 'manage' id=id %}",
+            });
+            alert('退出成功');
+            window.location.href = "{% url 'login'%}";
+        }
+        
+        function addBook() {
+            const b_id = document.getElementById('b_id').value;
+            const name = document.getElementById('b_name').value;
+            const zone = document.getElementById('b_zone').value;
+            const address = document.getElementById('b_address').value;
+            const state = document.getElementById('b_state').value;
+            const csrftoken = getCookie('csrftoken'); 
+            $.post({
+                url:"{% url 'manage' id=id %}?tab=3",
+                data: {action: 'member_add', name:name, id:b_id, address:address,zone:zone,state:state},
+                headers: {
+                    "X-CSRFToken": csrftoken}, // 添加 CSRF token 到请求头
+
+                success: function(response) {
+                    alert(response.message);
+                    closeModal('addbook'); // 先关闭模态框
+                    window.location.href = "{% url 'manage' id=id %}?tab=3";
+                },
+                error: function(xhr, status, error) {
+                    console.error("请求失败: ", status, error);
+                    window.location.href = "{% url 'manage' id=id %}?tab=3";
+                }
+            });
+            
+            alert('Adding new book...');
+            // Implement the logic to add a new book
+        }
+
+        function removeBook() {
+            const b_id = document.getElementById('bookidInput').value;
+            const state = document.getElementById('bookstateInput').value;
+            const csrftoken = getCookie('csrftoken'); 
+            $.post({
+                url:"{% url 'manage' id=id %}?tab=3",
+                data: {action: 'removebook', id:b_id, state:state},
+                headers: {
+                    "X-CSRFToken": csrftoken}, // 添加 CSRF token 到请求头
+                
+
+                success: function(response) {
+                    alert(response.message);
+                    closeModal('bookremove'); // 先关闭模态框
+                    window.location.href = "{% url 'manage' id=id %}?tab=3";
+                },
+                error: function(xhr, status, error) {
+                    console.error("请求失败: ", status, error);
+                    window.location.href = "{% url 'manage' id=id %}?tab=3";
+                }
+            });
+            // Implement the logic to remove a book
+        }
+
+        function viewInventory() {
+            alert('Viewing book inventory...');
+            // Implement the logic to view book inventory
+        }
+    </script>
+
+</body>
+</html>

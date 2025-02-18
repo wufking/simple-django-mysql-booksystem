@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>查找图书</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>查找图书</h1>
+    <input type="text" placeholder="图书名称或编号" id="search_input">
+    <button onclick="searchBook()">查找</button>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>图书编号</th>
+                <th>图书名称</th>
+                <th>借阅人姓名</th>
+                <th>借阅人身份证</th>
+                <th>借阅时间</th>
+                <th>归还时间</th>
+            </tr>
+        </thead>
+        <tbody id="book_table_body">
+            <!-- 图书数据将通过JavaScript填充 -->
+        </tbody>
+    </table>
+</body>
+</html>
