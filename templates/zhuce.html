@@ -1,3 +1,76 @@
+{#<!DOCTYPE html>#}
+{#<html lang="zh-CN">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1.0">#}
+{#    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>#}
+{#    <title>注册界面</title>#}
+{#    <link rel="stylesheet" href="style.css">#}
+{#</head>#}
+{#<body>#}
+{#<button onclick="location.href='{% url 'login' %}'">返回</button>#}
+{#    <h1>用户注册</h1>#}
+{#    <label for="m_name">#}
+{#    {% csrf_token %}#}
+{#        <input type="text" placeholder="用户姓名" id="m_name" required style="width: 300px; margin: 10px;">#}
+{#        <br>    #}
+{#        <input type="text" placeholder="用户电话" id="m_tel" required style="width: 300px; margin: 10px;">#}
+{#        <br>    #}
+{#        <input type="text" placeholder="用户地址" id="m_address" required style="width: 300px; margin: 10px;">#}
+{#        <br>    #}
+{#        <input type="text" placeholder="用户身份证" id="m_code" required style="width: 300px; margin: 10px;">#}
+{#        <br>    #}
+{#        <input type="text" placeholder="用户密码" id="m_pwd" required style="width: 300px; margin: 10px;">#}
+{#        <br>    #}
+{#        <button type="button" onclick="memberadd()" style="width: 300px; margin: 10px;">注册</button>#}
+{#    </label>#}
+{#    </form>#}
+{##}
+{##}
+{#    <script>#}
+{#        function memberadd(){#}
+{#            const name = document.getElementById('m_name').value;#}
+{#            const tel = document.getElementById('m_tel').value;#}
+{#            const address = document.getElementById('m_address').value;#}
+{#            const code = document.getElementById('m_code').value;#}
+{#            const pwd = document.getElementById('m_pwd').value;#}
+{#            const csrftoken = getCookie('csrftoken'); #}
+{#            $.post({#}
+{#                url:"{% url 'registration'%}",#}
+{#                data: {name:name, tel:tel, address:address,code:code,pwd:pwd},#}
+{#                headers: {#}
+{#                    "X-CSRFToken": csrftoken}, // 添加 CSRF token 到请求头#}
+{##}
+{#                success: function(response) {#}
+{#                    alert(response.message);#}
+{#                    window.location.href = "{% url 'login'%}";#}
+{#                },#}
+{#                error: function(xhr, status, error) {#}
+{#                    console.error("请求失败: ", status, error);#}
+{#                    window.location.href = "{% url 'registration'%}";#}
+{#                }#}
+{#            });#}
+{#        }#}
+{#        #}
+{#        function getCookie(name) {#}
+{#            let cookieValue = null;#}
+{#            if (document.cookie && document.cookie !== '') {#}
+{#                const cookies = document.cookie.split(';');#}
+{#                for (let i = 0; i < cookies.length; i++) {#}
+{#                    const cookie = cookies[i].trim();#}
+{#                    // 检查cookie是否以指定名称开头#}
+{#                    if (cookie.substring(0, name.length + 1) === (name + '=')) {#}
+{#                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));#}
+{#                        break;#}
+{#                    }#}
+{#                }#}
+{#            }#}
+{#            return cookieValue;#}
+{#        }#}
+{#    </script>#}
+{#</body>#}
+{#</html>#}
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -5,60 +78,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>注册界面</title>
-{#    <link rel="stylesheet" href="style.css">#}
 </head>
 <body>
-<button onclick="location.href='{% url 'login' %}'">返回</button>
+    <button onclick="location.href='{% url 'login' %}'">返回</button>
     <h1>用户注册</h1>
-    <label for="m_name">
-{#    {% csrf_token %}#}
-        <input type="text" placeholder="用户姓名" id="m_name" required style="width: 300px; margin: 10px;">
-        <br>    
-        <input type="text" placeholder="用户电话" id="m_tel" required style="width: 300px; margin: 10px;">
-        <br>    
-        <input type="text" placeholder="用户地址" id="m_address" required style="width: 300px; margin: 10px;">
-        <br>    
-        <input type="text" placeholder="用户身份证" id="m_code" required style="width: 300px; margin: 10px;">
-        <br>    
-        <input type="text" placeholder="用户密码" id="m_pwd" required style="width: 300px; margin: 10px;">
-        <br>    
-        <button type="button" onclick="memberadd()" style="width: 300px; margin: 10px;">注册</button>
-    </label>
-{#    </form>#}
 
+    <form id="registrationForm">
+        <input type="text" placeholder="用户姓名" id="m_name" name="name"  style="width: 300px; margin: 10px;">
+        <br>
+        <input type="text" placeholder="用户电话" id="m_tel" name="tel" required style="width: 300px; margin: 10px;">
+        <br>
+        <input type="text" placeholder="用户地址" id="m_address" name="address"  style="width: 300px; margin: 10px;">
+        <br>
+        <input type="text" placeholder="用户身份证" id="m_code" name="code"  style="width: 300px; margin: 10px;">
+        <br>
+        <input type="password" placeholder="用户密码" id="m_pwd" name="pwd" required style="width: 300px; margin: 10px;">
+        <br>
+        <button type="button" onclick="memberadd()" style="width: 300px; margin: 10px;">注册</button>
+    </form>
 
     <script>
         function memberadd(){
-            const name = document.getElementById('m_name').value;
+            const name = document.getElementById('name').value;
             const tel = document.getElementById('m_tel').value;
             const address = document.getElementById('m_address').value;
             const code = document.getElementById('m_code').value;
             const pwd = document.getElementById('m_pwd').value;
-            const csrftoken = getCookie('csrftoken'); 
-            $.post({
-                url:"{% url 'registration'%}",
-                data: {name:name, tel:tel, address:address,code:code,pwd:pwd},
-                headers: {
-                    "X-CSRFToken": csrftoken}, // 添加 CSRF token 到请求头
+            const csrftoken = getCookie('csrftoken');
 
+            $.ajax({
+                url: "{% url 'registration' %}",
+                type: "POST",
+                data: {
+                    name: name,
+                    tel: tel,
+                    address: address,
+                    code: code,
+                    pwd: pwd,
+                    csrfmiddlewaretoken: csrftoken
+                },
                 success: function(response) {
                     alert(response.message);
-                    window.location.href = "{% url 'login'%}";
+                    if (response.status === 'success') {
+                        window.location.href = "{% url 'login' %}";
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error("请求失败: ", status, error);
-                    window.location.href = "{% url 'registration'%}";
+                    alert("注册失败，请重试");
                 }
             });
         }
-        
+
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
                 const cookies = document.cookie.split(';');
                 for (let i = 0; i < cookies.length; i++) {
                     const cookie = cookies[i].trim();
-                    // 检查cookie是否以指定名称开头
                     if (cookie.substring(0, name.length + 1) === (name + '=')) {
                         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                         break;

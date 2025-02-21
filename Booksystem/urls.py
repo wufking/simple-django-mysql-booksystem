@@ -20,7 +20,6 @@ from django.views.generic import RedirectView
 from django.http import HttpResponseForbidden
 from django.contrib.auth import logout
 from django.shortcuts import redirect
-import books
 from books.views import Login,user,Manage,Registration  # 导入 books 应用中的视图
 
 def custom_admin_view(request):

@@ -10,16 +10,16 @@ class CustomUserAdmin(UserAdmin):
     # 显示哪些字段，字段按组划分，按需要显示在表单中
     fieldsets = (
         (None, {'fields': ('tel', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'address', 'book_number', 'code')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'address', 'borrowed_books_count', 'id_card')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
 
     # 在列表页中显示的字段
-    list_display = ('tel', 'username', 'code', 'email', 'is_staff', 'is_active', 'book_number','last_login')
+    list_display = ('tel', 'username', 'id_card', 'email', 'is_staff', 'is_active', 'borrowed_books_count','last_login')
 
     # 搜索字段：允许通过这些字段进行搜索
-    search_fields = ('tel', 'email', 'username', 'code')
+    search_fields = ('tel', 'email', 'username', 'id_card')
 
     # 过滤字段：可在侧边栏中按这些字段过滤
     list_filter = ('is_staff', 'is_active', 'groups')

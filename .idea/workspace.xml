@@ -5,35 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="93f9705d-be0f-4c01-8243-5d69899e0dc5" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/Booksystem.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Booksystem/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Booksystem/asgi.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Booksystem/settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Booksystem/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Booksystem/wsgi.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/books/forms.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/books/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/books/views/Manage.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/books/views/Registration.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/books/views/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/books/views/user.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/manage.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/Guanliyuan.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/fankui.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/jiashu.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/lend_book.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/manage.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/return_book.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/search_books.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/users.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/zhuce.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/临时.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Booksystem.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Booksystem.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Booksystem/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Booksystem/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/books/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/books/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/books/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/books/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/books/migrations/0002_alter_customuser_code.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/books/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/books/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/books/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/books/tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/books/views/Login.py" beforeDir="false" afterPath="$PROJECT_DIR$/books/views/Login.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/books/views/Manage.py" beforeDir="false" afterPath="$PROJECT_DIR$/books/views/Manage.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/books/views/Registration.py" beforeDir="false" afterPath="$PROJECT_DIR$/books/views/Registration.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/zhuce.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/zhuce.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/临时.py" beforeDir="false" afterPath="$PROJECT_DIR$/临时.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,36 +50,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;Django 服务器.Booksystem.executor&quot;: &quot;Run&quot;,
-    &quot;Django 服务器.未命名.executor&quot;: &quot;Run&quot;,
-    &quot;Django 测试.Test: books.tests.executor&quot;: &quot;Run&quot;,
-    &quot;Python.admin.executor&quot;: &quot;Run&quot;,
-    &quot;Python.apps.executor&quot;: &quot;Run&quot;,
-    &quot;Python.manage.executor&quot;: &quot;Run&quot;,
-    &quot;Python.tests.executor&quot;: &quot;Run&quot;,
-    &quot;Python.urls.executor&quot;: &quot;Run&quot;,
-    &quot;Python.views.executor&quot;: &quot;ConcurrencyExecutor&quot;,
-    &quot;Python.临时.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.pycharm.django.structure.promotion.once.per.project&quot;: &quot;true&quot;,
-    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/t1/transformers&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Django 服务器.Booksystem.executor": "Run",
+    "Django 服务器.未命名.executor": "Run",
+    "Django 测试.Test: books.tests.executor": "Run",
+    "Python.admin.executor": "Run",
+    "Python.apps.executor": "Run",
+    "Python.manage.executor": "Run",
+    "Python.tests.executor": "Run",
+    "Python.urls.executor": "Run",
+    "Python.views.executor": "ConcurrencyExecutor",
+    "Python.临时.executor": "Run",
+    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.pycharm.django.structure.promotion.once.per.project": "true",
+    "django.template.preview.state": "SHOW_EDITOR",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "E:/code/booksystem/simple-django-mysql-booksystem",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager" selected="Python.临时">
+}]]></component>
+  <component name="RunManager" selected="Python.tests">
     <configuration name="Test: books.tests" type="DjangoTestsConfigurationType" temporary="true">
       <module name="Booksystem" />
       <option name="ENV_FILES" value="" />
@@ -221,7 +206,6 @@
         <env name="DJANGO_SETTINGS_MODULE" value="Booksystem.settings" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.11 (Booksystem)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -247,7 +231,6 @@
         <env name="DJANGO_SETTINGS_MODULE" value="Booksystem.settings" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.11 (Booksystem)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -274,8 +257,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.临时" />
         <item itemvalue="Python.tests" />
+        <item itemvalue="Python.临时" />
         <item itemvalue="Python.views" />
         <item itemvalue="Django 测试.Test: books.tests" />
         <item itemvalue="Python.apps" />
@@ -346,6 +329,7 @@
       <workItem from="1733555806963" duration="4878000" />
       <workItem from="1733668731419" duration="2644000" />
       <workItem from="1739866150953" duration="644000" />
+      <workItem from="1740111512493" duration="8773000" />
     </task>
     <servers />
   </component>
@@ -364,13 +348,14 @@
     </option>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Booksystem$tests.coverage" NAME="tests 覆盖结果" MODIFIED="1731427441401" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/books" />
-    <SUITE FILE_PATH="coverage/Booksystem$Test__books_tests.coverage" NAME="Test: books.tests 覆盖结果" MODIFIED="1730355686247" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Booksystem$urls.coverage" NAME="urls 覆盖结果" MODIFIED="1729179770052" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Booksystem" />
+    <SUITE FILE_PATH="coverage/Booksystem$views.coverage" NAME="views 覆盖结果" MODIFIED="1730642044042" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/books" />
+    <SUITE FILE_PATH="coverage/Booksystem$Test__books_tests.coverage" NAME="Test: books.tests 覆盖结果" MODIFIED="1730355686247" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Booksystem$.coverage" NAME="临时 覆盖结果" MODIFIED="1732722833845" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Booksystem$manage.coverage" NAME="manage 覆盖结果" MODIFIED="1729323626281" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Booksystem$tests.coverage" NAME="tests 覆盖结果" MODIFIED="1731427441401" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/books" />
+    <SUITE FILE_PATH="coverage/simple_django_mysql_booksystem$tests.coverage" NAME="tests 覆盖结果" MODIFIED="1740119057102" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/books" />
     <SUITE FILE_PATH="coverage/Booksystem$admin.coverage" NAME="admin 覆盖结果" MODIFIED="1729250951212" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/books" />
     <SUITE FILE_PATH="coverage/Booksystem$apps.coverage" NAME="apps 覆盖结果" MODIFIED="1729599766803" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/books" />
-    <SUITE FILE_PATH="coverage/Booksystem$views.coverage" NAME="views 覆盖结果" MODIFIED="1730642044042" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/books" />
-    <SUITE FILE_PATH="coverage/Booksystem$manage.coverage" NAME="manage 覆盖结果" MODIFIED="1729323626281" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Booksystem$.coverage" NAME="临时 覆盖结果" MODIFIED="1732722833845" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

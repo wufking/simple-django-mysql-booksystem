@@ -28,6 +28,7 @@ def check_cookie(request):
 
 def home_login(request):
     tel = check_cookie(request)
+    print("tttttt:",tel)
     if tel:
         if request.session.get('status') == 'user':
             return redirect('users', tel = tel)
@@ -52,7 +53,10 @@ def home_login(request):
         usertype = request.POST.get('usertype')
 
         # 使用 authenticate 验证用户
+        print(tel)
+        print(pwd)
         user = authenticate(request, tel=tel, password=pwd)
+        print("uuuu:",user)
 
         if user is not None:  # 验证密码
             # 登录用户

@@ -131,7 +131,7 @@ def manages(request,id):
             member_tel = request.POST.get('tel', None)
             member_name = request.POST.get('name', None)
             if not member_tel and not member_name:
-                members = CustomUser.objects.exclude(book_number='0').order_by('last_login')
+                members = CustomUser.objects.exclude(borrowed_books_count='0').order_by('last_login')
                 # return render(request, 'Guanliyuan.html', {
                 #     'id': id,
                 #     'members': members,
@@ -139,7 +139,7 @@ def manages(request,id):
                 # })
             else:
                 members_a = find_data(member_tel, member_name,CustomUser,MemberTel,MemberName)
-                members = members_a.exclude(book_number='0').order_by('last_login')
+                members = members_a.exclude(borrowed_books_count='0').order_by('last_login')
             return render(request, 'Guanliyuan.html', {
                 'id': id,
                 'members': members,
@@ -150,10 +150,10 @@ def manages(request,id):
             name = request.POST.get('name')
             tel = request.POST.get('tel')
             address = request.POST.get('address')
-            code = request.POST.get('code')
+            id_card = request.POST.get('id_card')
             pwd = request.POST.get('pwd')
             try:
-                CustomUser.objects.create(username=name,tel=tel,address=address,code=code,password=pwd)
+                CustomUser.objects.create_user(username=name,tel=tel,address=address,id_card=id_card,password=pwd)
                 return JsonResponse({'status': 'success','message':"创建成功！"})
             except IntegrityError:
                 return JsonResponse({'status': 'error', 'message': '同一手机号或同一身份证不能注册多个账户！'})

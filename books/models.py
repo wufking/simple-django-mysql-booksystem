@@ -4,38 +4,39 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone  # 导入 timezone
 from django.contrib.auth.models import BaseUserManager
+from django.core.validators import MinLengthValidator
 
-class CustomUserManager(BaseUserManager):
-    def create_user(self, tel, password, **extra_fields):
-        if not tel:
-            raise ValueError('The Telephone field must be set')  # ValueError
-        if not password:
-            raise ValueError('The Password field must be set')  # 添加检查
-        user = self.model(tel=tel, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, tel, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-
-        return self.create_user(tel, password, **extra_fields)
-
-
-class CustomUser(AbstractUser):
-    tel = models.CharField(max_length=15, unique=True, primary_key=True) # 主键电话
-    address = models.CharField(max_length=50, null=True, blank=True) # 用户地址
-    book_number = models.IntegerField(default=0) # 现在借了几本书
-    code = models.BigIntegerField(unique=True, null=True) # 身份证
-
-    objects = CustomUserManager()  # 使用自定义管理器
-
-    USERNAME_FIELD = 'tel'  # 使用 'tel' 作为用户名字段
-    REQUIRED_FIELDS = ['username', 'email']  # 创建用户时要求 'username' 和 'email' 字段
-
-    def __str__(self):
-        return self.tel
+# class CustomUserManager(BaseUserManager):
+#     def create_user(self, tel, password, **extra_fields):
+#         if not tel:
+#             raise ValueError('The Telephone field must be set')  # ValueError
+#         if not password:
+#             raise ValueError('The Password field must be set')  # 添加检查
+#         user = self.model(tel=tel, **extra_fields)
+#         user.set_password(password)
+#         user.save(using=self._db)
+#         return user
+#
+#     def create_superuser(self, tel, password=None, **extra_fields):
+#         extra_fields.setdefault('is_staff', True)
+#         extra_fields.setdefault('is_superuser', True)
+#
+#         return self.create_user(tel, password, **extra_fields)
+#
+#
+# class CustomUser(AbstractUser):
+#     tel = models.CharField(max_length=15, unique=True, primary_key=True) # 主键电话
+#     address = models.CharField(max_length=50, null=True, blank=True) # 用户地址
+#     book_number = models.IntegerField(default=0) # 现在借了几本书
+#     code = models.BigIntegerField(unique=True, null=True) # 身份证
+#
+#     objects = CustomUserManager()  # 使用自定义管理器
+#
+#     USERNAME_FIELD = 'tel'  # 使用 'tel' 作为用户名字段
+#     REQUIRED_FIELDS = ['username', 'email']  # 创建用户时要求 'username' 和 'email' 字段
+#
+#     def __str__(self):
+#         return self.tel
 """
 username：唯一标识用户的用户名。
 last_name：用户的姓氏。
@@ -48,8 +49,58 @@ is_superuser：布尔值，表示用户是否是超级管理员，超级管理�
 last_login：用户的最后登录时间。
 date_joined：用户账户创建的时间。
 """
+class CustomUserManager(BaseUserManager):
+    def create_user(self, tel, password=None, **extra_fields):
+        if not tel:
+            raise ValueError("必须填写手机号")
+
+        # 自动生成唯一用户名（避免与AbstractUser的username冲突）
+        extra_fields.setdefault("username", f"user_{tel}")
+
+        user = self.model(tel=tel, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, tel, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        # 强制校验权限字段
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("超级用户必须 is_staff=True")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("超级用户必须 is_superuser=True")
+
+        return self.create_user(tel, password, **extra_fields)
 
 
+class CustomUser(AbstractUser):
+    tel = models.CharField(
+        "手机号",
+        max_length=20,  # 兼容国际号码
+        unique=True,
+        primary_key=True,
+        validators=[MinLengthValidator(11)]  # 国内手机号至少11位
+    )
+    address = models.CharField("地址", max_length=50, blank=True, null=True)
+    borrowed_books_count = models.PositiveIntegerField("已借阅数量", default=0)  # 明确字段用途
+    id_card = models.CharField(  # 更名且改用CharField
+        "身份证号",
+        max_length=18,
+        unique=True,
+        validators=[MinLengthValidator(18)],
+        blank=True,
+        null=True
+    )
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = "tel"  # 用手机号作为登录标识
+    REQUIRED_FIELDS = []  # 清空默认必填字段
+
+    def __str__(self):
+        return f"{self.tel} ({self.id_card})"
 
 
 
